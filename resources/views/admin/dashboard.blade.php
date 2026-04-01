@@ -35,7 +35,6 @@
                         <h3 class="text-xl font-semibold text-slate-900">Recent Students</h3>
                         <p class="mt-1 text-sm text-slate-500">Latest records already stored in the system.</p>
                     </div>
-                    <span class="rounded-full bg-[#eef2ff] px-3 py-1 text-xs font-medium text-[#2f63f0]">Live data</span>
                 </div>
 
                 <div class="mt-5 overflow-hidden rounded-3xl border border-slate-100">
