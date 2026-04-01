@@ -7,16 +7,16 @@
 
 @section('content')
     <div class="space-y-6">
-        <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <section class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             @foreach ($stats as $stat)
-                <div class="rounded-[26px] bg-white p-5 shadow-[0_10px_30px_rgba(18,38,104,0.07)] ring-1 ring-slate-100">
+                <div class="rounded-[26px] bg-white p-6 shadow-[0_10px_30px_rgba(18,38,104,0.07)] ring-1 ring-slate-100">
                     <p class="text-sm font-medium text-slate-500">{{ $stat['label'] }}</p>
                     <div class="mt-4 flex items-end justify-between gap-4">
                         <div>
                             <h2 class="text-4xl font-semibold tracking-tight text-slate-900">{{ $stat['value'] }}</h2>
                             <p class="mt-2 text-sm text-slate-500">{{ $stat['detail'] }}</p>
                         </div>
-                        <div class="grid h-12 w-12 place-items-center rounded-2xl
+                        <div class="grid h-13 w-13 place-items-center rounded-2xl
                             @if($stat['accent'] === 'blue') bg-blue-50 text-blue-600
                             @elseif($stat['accent'] === 'violet') bg-violet-50 text-violet-600
                             @elseif($stat['accent'] === 'emerald') bg-emerald-50 text-emerald-600
@@ -28,7 +28,7 @@
             @endforeach
         </section>
 
-        <section class="grid gap-6 xl:grid-cols-[1.35fr_0.9fr]">
+        <section class="grid gap-6 lg:grid-cols-2">
             <div class="rounded-[28px] bg-white p-6 shadow-[0_10px_30px_rgba(18,38,104,0.07)] ring-1 ring-slate-100">
                 <div class="flex items-center justify-between">
                     <div>
@@ -66,28 +66,20 @@
                 </div>
             </div>
 
-            <div class="space-y-6">
-                <div class="rounded-[28px] bg-white p-6 shadow-[0_10px_30px_rgba(18,38,104,0.07)] ring-1 ring-slate-100">
-                    <h3 class="text-xl font-semibold text-slate-900">Module Access</h3>
-                    <div class="mt-4 grid gap-3">
-                        @foreach ([
-                            ['title' => 'Students', 'desc' => 'View and manage student profiles'],
-                            ['title' => 'Courses', 'desc' => 'Create subjects and class offerings'],
-                            ['title' => 'Teachers', 'desc' => 'Assign teaching staff'],
-                            ['title' => 'Grades', 'desc' => 'Track exam and class results'],
-                        ] as $module)
-                            <div class="rounded-2xl bg-[#f8faff] px-4 py-3 ring-1 ring-slate-100">
-                                <p class="font-medium text-slate-900">{{ $module['title'] }}</p>
-                                <p class="mt-1 text-sm text-slate-500">{{ $module['desc'] }}</p>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-
-                <div class="rounded-[28px] bg-[#2f63f0] p-6 text-white shadow-[0_16px_40px_rgba(47,99,240,0.32)]">
-                    <p class="text-sm uppercase tracking-[0.3em] text-white/70">Admin Note</p>
-                    <h3 class="mt-3 text-2xl font-semibold">Charts and analytics are intentionally not added yet.</h3>
-                    <p class="mt-3 text-sm leading-6 text-white/80">This dashboard is structured so you can expand each module later without changing the login or layout flow.</p>
+            <div class="rounded-[28px] bg-white p-6 shadow-[0_10px_30px_rgba(18,38,104,0.07)] ring-1 ring-slate-100">
+                <h3 class="text-xl font-semibold text-slate-900">Module Access</h3>
+                <div class="mt-4 grid gap-3">
+                    @foreach ([
+                        ['title' => 'Students', 'desc' => 'View and manage student profiles'],
+                        ['title' => 'Courses', 'desc' => 'Create subjects and class offerings'],
+                        ['title' => 'Teachers', 'desc' => 'Assign teaching staff'],
+                        ['title' => 'Grades', 'desc' => 'Track exam and class results'],
+                    ] as $module)
+                        <div class="rounded-2xl bg-[#f8faff] px-4 py-3 ring-1 ring-slate-100">
+                            <p class="font-medium text-slate-900">{{ $module['title'] }}</p>
+                            <p class="mt-1 text-sm text-slate-500">{{ $module['desc'] }}</p>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </section>
