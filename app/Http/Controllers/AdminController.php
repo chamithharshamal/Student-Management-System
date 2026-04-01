@@ -16,7 +16,7 @@ class AdminController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'username' => ['required', 'string'],
             'password' => ['required', 'string'],
         ]);
 
@@ -28,9 +28,9 @@ class AdminController extends Controller
 
         return back()
             ->withErrors([
-                'email' => 'The provided credentials are incorrect.',
+                'username' => 'The provided credentials are incorrect.',
             ])
-            ->onlyInput('email');
+            ->onlyInput('username');
     }
 
     public function logout(Request $request)
