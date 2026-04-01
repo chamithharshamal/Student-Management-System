@@ -16,5 +16,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/students', [AdminController::class, 'students'])->name('admin.students');
+    Route::post('/students', [AdminController::class, 'storeStudent'])->name('admin.students.store');
     Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
 });
