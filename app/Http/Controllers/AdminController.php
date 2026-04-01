@@ -50,9 +50,9 @@ class AdminController extends Controller
 
         $stats = [
             ['label' => 'Students', 'value' => $studentCount, 'detail' => 'Active enrollments', 'accent' => 'blue'],
-            ['label' => 'Courses', 'value' => 12, 'detail' => 'Published modules', 'accent' => 'violet'],
-            ['label' => 'Teachers', 'value' => 8, 'detail' => 'Assigned staff', 'accent' => 'emerald'],
-            ['label' => 'Grades', 'value' => 24, 'detail' => 'Recorded results', 'accent' => 'amber'],
+            ['label' => 'Courses', 'value' => 0, 'detail' => 'Published modules', 'accent' => 'violet'],
+            ['label' => 'Teachers', 'value' => 0, 'detail' => 'Assigned staff', 'accent' => 'emerald'],
+            ['label' => 'Grades', 'value' => 0, 'detail' => 'Recorded results', 'accent' => 'amber'],
         ];
 
         $recentStudents = Student::latest()->limit(5)->get();
