@@ -8,9 +8,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-[#d7def8] text-slate-800">
-<div class="min-h-screen">
+<div id="app-wrapper" class="min-h-screen transition-all duration-500">
     <div class="flex min-h-screen w-full overflow-hidden bg-[#eef2ff]">
-        <aside class="hidden w-[240px] shrink-0 flex-col bg-[#2f63f0] px-5 py-5 text-white lg:flex">
+        <aside class="hidden w-[240px] shrink-0 flex-col bg-slate-900 px-5 py-5 text-white lg:flex">
             <div class="mb-8 flex items-center gap-3">
                 <div class="grid h-11 w-11 place-items-center rounded-2xl bg-white/15 ring-1 ring-white/20">
                     <svg viewBox="0 0 24 24" class="h-6 w-6 fill-none stroke-current stroke-[1.8]">
@@ -71,16 +71,14 @@
                     </div>
 
                     <div class="flex items-center gap-3">
-                        <div class="hidden rounded-2xl bg-slate-100 px-4 py-2 text-sm text-slate-500 md:block">
-                            Search records
-                        </div>
+
                         <form method="POST" action="{{ route('admin.logout') }}">
                             @csrf
                             <button type="submit" class="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900">
                                 Logout
                             </button>
                         </form>
-                        <div class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-[#2f63f0] text-sm font-semibold text-white">
+                        <div class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-slate-800 text-sm font-semibold text-white">
                             A
                         </div>
                     </div>
@@ -93,5 +91,6 @@
         </div>
     </div>
 </div>
+    @stack('modals')
 </body>
 </html>

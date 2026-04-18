@@ -18,5 +18,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/students', [AdminController::class, 'students'])->name('admin.students');
     Route::post('/students', [AdminController::class, 'storeStudent'])->name('admin.students.store');
+    Route::put('/students/{student}', [AdminController::class, 'updateStudent'])->name('admin.students.update');
+    Route::delete('/students/{student}', [AdminController::class, 'deleteStudent'])->name('admin.students.destroy');
+    Route::get('/students/export/csv', [AdminController::class, 'exportCsv'])->name('admin.students.export.csv');
+    Route::get('/students/export/pdf', [AdminController::class, 'exportPdf'])->name('admin.students.export.pdf');
+    Route::post('/students/import', [AdminController::class, 'importStudents'])->name('admin.students.import');
     Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
 });
