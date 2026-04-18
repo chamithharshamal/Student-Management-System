@@ -49,12 +49,15 @@ class AdminController extends Controller
     public function dashboard()
     {
         $studentCount = Student::count();
+        $thisMonthCount = Student::whereMonth('created_at', Carbon::now()->month)->count();
+        $courseCount = \App\Models\Course::count();
+        $teacherCount = \App\Models\Teacher::count();
 
         $stats = [
             ['label' => 'Students', 'value' => $studentCount, 'detail' => 'Active enrollments', 'accent' => 'blue'],
-            ['label' => 'Courses', 'value' => 0, 'detail' => 'Published modules', 'accent' => 'violet'],
-            ['label' => 'Teachers', 'value' => 0, 'detail' => 'Assigned staff', 'accent' => 'emerald'],
-            ['label' => 'Grades', 'value' => 0, 'detail' => 'Recorded results', 'accent' => 'amber'],
+            ['label' => 'New This Month', 'value' => $thisMonthCount, 'detail' => 'Recent registrations', 'accent' => 'emerald'],
+            ['label' => 'Courses', 'value' => $courseCount, 'detail' => 'Published modules', 'accent' => 'violet'],
+            ['label' => 'Teachers', 'value' => $teacherCount, 'detail' => 'Assigned staff', 'accent' => 'amber'],
         ];
 
         $recentStudents = Student::latest()->limit(5)->get();

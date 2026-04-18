@@ -35,11 +35,11 @@
                     <span class="grid h-8 w-8 place-items-center rounded-xl bg-white/10">S</span>
                     Students
                 </a>
-                <a href="#" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-white/85 hover:bg-white/10">
+                <a href="{{ route('admin.courses') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-white/85 ring-1 {{ request()->routeIs('admin.courses*') ? 'bg-white/15 ring-white/40' : 'ring-transparent hover:bg-white/10' }}">
                     <span class="grid h-8 w-8 place-items-center rounded-xl bg-white/10">C</span>
                     Courses
                 </a>
-                <a href="#" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-white/85 hover:bg-white/10">
+                <a href="{{ route('admin.teachers') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-white/85 ring-1 {{ request()->routeIs('admin.teachers*') ? 'bg-white/15 ring-white/40' : 'ring-transparent hover:bg-white/10' }}">
                     <span class="grid h-8 w-8 place-items-center rounded-xl bg-white/10">T</span>
                     Teachers
                 </a>
@@ -86,6 +86,56 @@
             </header>
 
             <main class="flex-1 overflow-auto px-5 py-5 xl:px-8">
+                @if (session('status'))
+                    <div id="globalStatus" class="fixed top-5 right-5 z-[9999] flex items-center gap-3 rounded-2xl px-4 py-3 shadow-[0_8px_32px_rgba(16,185,129,0.35)] transition-all duration-500" style="max-width:360px; background-color:#10b981;">
+                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/20">
+                            <svg class="h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <p class="flex-1 text-sm font-semibold text-white">{{ session('status') }}</p>
+                        <button onclick="dismissToast()" class="shrink-0 text-white/70 transition hover:text-white">
+                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <script>
+                        function dismissToast() {
+                            const toast = document.getElementById('globalStatus');
+                            if (toast) {
+                                toast.style.opacity = '0';
+                                toast.style.transform = 'translateY(-12px)';
+                                setTimeout(() => toast.remove(), 400);
+                            }
+                        }
+                        setTimeout(dismissToast, 4000);
+                    </script>
+                @endif
+
+                @if ($errors->any())
+                    <div class="mb-6 flex items-start justify-between gap-3 rounded-2xl bg-rose-50 px-4 py-3 text-rose-800 ring-1 ring-rose-200 transition-all">
+                        <div class="flex items-start gap-3">
+                            <svg class="h-5 w-5 shrink-0 text-rose-600 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                            </svg>
+                            <div class="text-sm font-medium">
+                                <p>There was a problem with your submission:</p>
+                                <ul class="mt-1 list-inside list-disc opacity-90">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                        <button onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 mt-0.5">
+                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                            </svg>
+                        </button>
+                    </div>
+                @endif
+
                 @yield('content')
             </main>
         </div>

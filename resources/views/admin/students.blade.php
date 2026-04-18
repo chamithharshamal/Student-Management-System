@@ -109,20 +109,7 @@
                 </div>
             </form>
 
-            @if (session('status'))
-                <div id="statusNotification" class="mt-5 rounded-3xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 transition-opacity duration-500">
-                    {{ session('status') }}
-                </div>
-                <script>
-                    setTimeout(() => {
-                        const notification = document.getElementById('statusNotification');
-                        if (notification) {
-                            notification.style.opacity = '0';
-                            setTimeout(() => notification.remove(), 500); // Wait for transition before removing
-                        }
-                    }, 3000);
-                </script>
-            @endif
+
 
             <div class="mt-5 overflow-hidden rounded-3xl border border-slate-100">
                 <table class="min-w-full divide-y divide-slate-100 text-left text-base">
