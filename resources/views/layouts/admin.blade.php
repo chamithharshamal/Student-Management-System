@@ -43,6 +43,10 @@
                     <span class="grid h-8 w-8 place-items-center rounded-xl bg-white/10">T</span>
                     Teachers
                 </a>
+                <a href="{{ route('admin.enrollments') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-white/85 ring-1 {{ request()->routeIs('admin.enrollments*') ? 'bg-white/15 ring-white/40' : 'ring-transparent hover:bg-white/10' }}">
+                    <span class="grid h-8 w-8 place-items-center rounded-xl bg-white/10">E</span>
+                    Enrollments
+                </a>
                 <a href="#" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-white/85 hover:bg-white/10">
                     <span class="grid h-8 w-8 place-items-center rounded-xl bg-white/10">G</span>
                     Grades

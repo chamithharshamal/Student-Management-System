@@ -16,4 +16,14 @@ class Student extends Model
         'dob',
         'age'
     ];
+
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'enrollments')->withPivot('status', 'grade', 'enrolled_at')->withTimestamps();
+    }
 }

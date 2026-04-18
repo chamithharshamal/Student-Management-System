@@ -14,6 +14,7 @@ class Teacher extends Model
         'email',
         'phone',
         'specialization',
+        'qualification',
     ];
 
     public function courses()

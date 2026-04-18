@@ -4,28 +4,30 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Teacher;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Spatie\SimpleExcel\SimpleExcelReader;
 
 class CourseController extends Controller
 {
     public function index()
     {
-        $courses = Course::with('teacher')->latest()->get();
-        $teachers = Teacher::all(); // To populate the dropdown
+        $courses  = Course::with('teacher')->latest()->get();
+        $teachers = Teacher::all();
         return view('admin.courses', compact('courses', 'teachers'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'code' => 'required|string|unique:courses,code|max:50',
-            'name' => 'required|string|max:255',
+            'code'        => 'required|string|unique:courses,code|max:50',
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
-            'credits' => 'required|integer|min:1',
-            'teacher_id' => 'nullable|exists:teachers,id',
+            'credits'     => 'required|integer|min:1',
+            'teacher_id'  => 'nullable|exists:teachers,id',
         ]);
 
-        Course::create($request->all());
+        Course::create($request->only('code', 'name', 'description', 'credits', 'teacher_id'));
 
         return redirect()->route('admin.courses')->with('status', 'Course added successfully.');
     }
@@ -33,14 +35,14 @@ class CourseController extends Controller
     public function update(Request $request, Course $course)
     {
         $request->validate([
-            'code' => 'required|string|max:50|unique:courses,code,' . $course->id,
-            'name' => 'required|string|max:255',
+            'code'        => 'required|string|max:50|unique:courses,code,' . $course->id,
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
-            'credits' => 'required|integer|min:1',
-            'teacher_id' => 'nullable|exists:teachers,id',
+            'credits'     => 'required|integer|min:1',
+            'teacher_id'  => 'nullable|exists:teachers,id',
         ]);
 
-        $course->update($request->all());
+        $course->update($request->only('code', 'name', 'description', 'credits', 'teacher_id'));
 
         return redirect()->route('admin.courses')->with('status', 'Course updated successfully.');
     }
@@ -49,5 +51,82 @@ class CourseController extends Controller
     {
         $course->delete();
         return redirect()->route('admin.courses')->with('status', 'Course deleted successfully.');
+    }
+
+    // ── Export ────────────────────────────────────────────────────────────────
+
+    public function exportCsv()
+    {
+        $courses = Course::with('teacher')->orderBy('code')->get();
+
+        $headers = [
+            'Content-type'        => 'text/csv',
+            'Content-Disposition' => 'attachment; filename=courses.csv',
+            'Pragma'              => 'no-cache',
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires'             => '0',
+        ];
+
+        $callback = function () use ($courses) {
+            $file = fopen('php://output', 'w');
+            fputs($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fputcsv($file, ['Code', 'Name', 'Description', 'Credits', 'Teacher']);
+            foreach ($courses as $c) {
+                fputcsv($file, [$c->code, $c->name, $c->description, $c->credits, $c->teacher->name ?? '']);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function exportPdf()
+    {
+        $courses = Course::with('teacher')->orderBy('code')->get();
+        $pdf = Pdf::loadView('admin.courses_pdf', compact('courses'));
+        return $pdf->download('courses.pdf');
+    }
+
+    // ── Import ────────────────────────────────────────────────────────────────
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:10240'],
+        ]);
+
+        $file      = $request->file('file');
+        $filePath  = $file->getRealPath();
+        $extension = $file->getClientOriginalExtension();
+
+        try {
+            $reader  = SimpleExcelReader::create($filePath, $extension);
+            $added   = 0;
+            $skipped = 0;
+
+            $reader->getRows()->each(function (array $row) use (&$added, &$skipped) {
+                $code        = $row['code']        ?? $row['Code']        ?? null;
+                $name        = $row['name']        ?? $row['Name']        ?? null;
+                $description = $row['description'] ?? $row['Description'] ?? null;
+                $credits     = $row['credits']     ?? $row['Credits']     ?? 3;
+
+                if ($code && $name) {
+                    if (Course::where('code', $code)->exists()) { $skipped++; return; }
+                    Course::create(compact('code', 'name', 'description', 'credits'));
+                    $added++;
+                } else {
+                    $skipped++;
+                }
+            });
+
+            $msg = "Import completed! {$added} courses added.";
+            if ($skipped) $msg .= " {$skipped} rows skipped.";
+
+            return redirect()->route('admin.courses')->with('status', $msg);
+
+        } catch (\Exception $e) {
+            return redirect()->route('admin.courses')
+                ->withErrors(['file' => 'Error processing file: ' . $e->getMessage()]);
+        }
     }
 }

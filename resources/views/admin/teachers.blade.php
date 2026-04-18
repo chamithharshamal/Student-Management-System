@@ -10,7 +10,46 @@
         <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
             <h1 class="text-2xl font-semibold tracking-tight text-slate-900 md:hidden">Teachers</h1>
             <div class="hidden md:block"></div>
-            <div class="flex items-center gap-3 w-full md:w-auto">
+            <div class="flex items-center gap-3 w-full md:w-auto relative">
+
+                {{-- Export Dropdown --}}
+                <div class="relative inline-block text-left flex-1 md:flex-none">
+                    <button type="button" id="exportTeacherBtn" onclick="toggleTeacherExport()"
+                            class="w-full justify-center inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 hover:shadow">
+                        <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
+                        Export
+                        <svg class="-mr-1 ml-1 h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="teacherExportDropdown" class="hidden absolute right-0 z-10 mt-2 w-44 origin-top-right rounded-2xl bg-white shadow-lg ring-1 ring-slate-900/5">
+                        <div class="p-1">
+                            <a href="{{ route('admin.teachers.export.csv') }}" class="group flex items-center rounded-xl px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                                <svg class="mr-3 h-4 w-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                </svg>
+                                Excel (CSV)
+                            </a>
+                            <a href="{{ route('admin.teachers.export.pdf') }}" target="_blank" class="group flex items-center rounded-xl px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                                <svg class="mr-3 h-4 w-4 text-rose-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                </svg>
+                                PDF Document
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" onclick="openTeacherImportModal()"
+                    class="flex-1 md:flex-none justify-center inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 hover:shadow">
+                    <svg class="h-4 w-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                    </svg>
+                    Import
+                </button>
+
                 <button type="button" onclick="openTeacherModal()"
                     class="flex-1 md:flex-none justify-center inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#1e293b_0%,#0f172a_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_38px_rgba(15,23,42,0.28)] transition hover:-translate-y-px hover:shadow-[0_22px_42px_rgba(15,23,42,0.34)]">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
@@ -243,5 +282,57 @@
         @elseif($errors->any())
             openTeacherModal();
         @endif
+
+        function toggleTeacherExport() {
+            const d = document.getElementById('teacherExportDropdown');
+            d.classList.toggle('hidden');
+        }
+        document.addEventListener('click', function(e) {
+            if (!document.getElementById('exportTeacherBtn').contains(e.target)) {
+                document.getElementById('teacherExportDropdown').classList.add('hidden');
+            }
+        });
+
+        function openTeacherImportModal() {
+            const m = document.getElementById('teacherImportModal');
+            m.classList.remove('hidden'); m.classList.add('flex');
+        }
+        function closeTeacherImportModal() {
+            const m = document.getElementById('teacherImportModal');
+            m.classList.add('hidden'); m.classList.remove('flex');
+        }
     </script>
+
+    {{-- Import Modal --}}
+    <div id="teacherImportModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 px-4 py-6 backdrop-blur-sm">
+        <div class="w-full max-w-md overflow-hidden rounded-[28px] bg-white ring-1 ring-slate-200/50 shadow-[0_24px_80px_-12px_rgba(18,38,104,0.4)]">
+            <div class="border-b border-slate-100 px-6 py-5 flex items-start justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-semibold text-slate-900">Import Teachers</h2>
+                    <p class="text-sm text-slate-400 mt-0.5">Upload CSV / Excel file</p>
+                </div>
+                <button type="button" onclick="closeTeacherImportModal()" class="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">
+                    <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current stroke-[2]"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" /></svg>
+                </button>
+            </div>
+            <form method="POST" action="{{ route('admin.teachers.import') }}" enctype="multipart/form-data" class="px-6 py-6 space-y-5">
+                @csrf
+                <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 px-6 py-8 text-center">
+                    <svg class="mx-auto mb-3 h-10 w-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                    </svg>
+                    <label for="teacher_import_file" class="cursor-pointer text-sm font-semibold text-slate-700 hover:text-slate-900">
+                        Click to choose file
+                        <input id="teacher_import_file" type="file" name="file" accept=".csv,.xlsx,.xls" class="sr-only">
+                    </label>
+                    <p class="mt-1 text-xs text-slate-400">CSV, XLS, or XLSX · Max 10MB</p>
+                </div>
+                <p class="text-xs text-slate-400">Expected columns: <code class="bg-slate-100 px-1 rounded">name, email, phone, specialization, qualification</code></p>
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="closeTeacherImportModal()" class="flex-1 rounded-3xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="flex-1 rounded-3xl bg-[linear-gradient(135deg,#1e293b_0%,#0f172a_100%)] px-4 py-3.5 text-sm font-semibold text-white shadow-[0_18px_38px_rgba(15,23,42,0.28)] transition hover:-translate-y-px">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endpush
