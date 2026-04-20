@@ -98,20 +98,30 @@ class TeacherController extends Controller
         $extension = $file->getClientOriginalExtension();
 
         try {
-            $reader   = SimpleExcelReader::create($filePath, $extension);
-            $added    = 0;
-            $skipped  = 0;
+            $reader = SimpleExcelReader::create($filePath, $extension)
+                ->headersToSnakeCase();
+            $added   = 0;
+            $skipped = 0;
 
             $reader->getRows()->each(function (array $row) use (&$added, &$skipped) {
-                $name           = $row['name']           ?? $row['Name']           ?? null;
-                $email          = $row['email']          ?? $row['Email']          ?? null;
-                $phone          = $row['phone']          ?? $row['Phone']          ?? null;
-                $specialization = $row['specialization'] ?? $row['Specialization'] ?? null;
-                $qualification  = $row['qualification']  ?? $row['Qualification']  ?? null;
+                $name           = trim($row['name'] ?? $row['teacher_name'] ?? $row['staff_name'] ?? $row['instructor'] ?? null);
+                $email          = trim($row['email'] ?? $row['email_address'] ?? null);
+                $phone          = trim($row['phone'] ?? $row['phone_number'] ?? $row['contact'] ?? null);
+                $specialization = trim($row['specialization'] ?? $row['expertise'] ?? $row['subject'] ?? null);
+                $qualification  = trim($row['qualification'] ?? $row['degree'] ?? $row['qualifications'] ?? null);
 
                 if ($name && $email) {
-                    if (Teacher::where('email', $email)->exists()) { $skipped++; return; }
-                    Teacher::create(compact('name', 'email', 'phone', 'specialization', 'qualification'));
+                    if (Teacher::where('email', $email)->exists()) { 
+                        $skipped++; 
+                        return; 
+                    }
+                    Teacher::create([
+                        'name' => $name,
+                        'email' => $email,
+                        'phone' => $phone,
+                        'specialization' => $specialization,
+                        'qualification' => $qualification
+                    ]);
                     $added++;
                 } else {
                     $skipped++;
@@ -119,7 +129,9 @@ class TeacherController extends Controller
             });
 
             $msg = "Import completed! {$added} teachers added.";
-            if ($skipped) $msg .= " {$skipped} rows skipped.";
+            if ($skipped > 0) {
+                $msg .= " {$skipped} rows were skipped (duplicates or missing data).";
+            }
 
             return redirect()->route('admin.teachers')->with('status', $msg);
 

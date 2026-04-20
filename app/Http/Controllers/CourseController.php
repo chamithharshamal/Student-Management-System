@@ -100,19 +100,28 @@ class CourseController extends Controller
         $extension = $file->getClientOriginalExtension();
 
         try {
-            $reader  = SimpleExcelReader::create($filePath, $extension);
+            $reader = SimpleExcelReader::create($filePath, $extension)
+                ->headersToSnakeCase();
             $added   = 0;
             $skipped = 0;
 
             $reader->getRows()->each(function (array $row) use (&$added, &$skipped) {
-                $code        = $row['code']        ?? $row['Code']        ?? null;
-                $name        = $row['name']        ?? $row['Name']        ?? null;
-                $description = $row['description'] ?? $row['Description'] ?? null;
-                $credits     = $row['credits']     ?? $row['Credits']     ?? 3;
+                $code        = trim($row['code'] ?? $row['course_code'] ?? null);
+                $name        = trim($row['name'] ?? $row['course_name'] ?? $row['title'] ?? null);
+                $description = trim($row['description'] ?? $row['desc'] ?? null);
+                $credits     = trim($row['credits'] ?? $row['credit_hours'] ?? 3);
 
                 if ($code && $name) {
-                    if (Course::where('code', $code)->exists()) { $skipped++; return; }
-                    Course::create(compact('code', 'name', 'description', 'credits'));
+                    if (Course::where('code', $code)->exists()) { 
+                        $skipped++; 
+                        return; 
+                    }
+                    Course::create([
+                        'code' => $code,
+                        'name' => $name,
+                        'description' => $description,
+                        'credits' => $credits
+                    ]);
                     $added++;
                 } else {
                     $skipped++;
@@ -120,7 +129,9 @@ class CourseController extends Controller
             });
 
             $msg = "Import completed! {$added} courses added.";
-            if ($skipped) $msg .= " {$skipped} rows skipped.";
+            if ($skipped > 0) {
+                $msg .= " {$skipped} rows were skipped (duplicates or missing data).";
+            }
 
             return redirect()->route('admin.courses')->with('status', $msg);
 

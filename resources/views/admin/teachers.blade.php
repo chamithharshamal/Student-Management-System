@@ -296,41 +296,132 @@
         function openTeacherImportModal() {
             const m = document.getElementById('teacherImportModal');
             m.classList.remove('hidden'); m.classList.add('flex');
+            document.body.classList.add('overflow-hidden');
         }
         function closeTeacherImportModal() {
             const m = document.getElementById('teacherImportModal');
             m.classList.add('hidden'); m.classList.remove('flex');
+            document.body.classList.remove('overflow-hidden');
         }
+
+        function handleTeacherDrop(event) {
+            const fileInput = document.getElementById('teacher_import_file');
+            if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+                fileInput.files = event.dataTransfer.files;
+                updateTeacherFileName(fileInput);
+            }
+        }
+
+        function updateTeacherFileName(input) {
+            const display = document.getElementById('teacherFileNameDisplay');
+            const dropzone = document.getElementById('teacherDropzone');
+            const defaultIcon = document.getElementById('teacher-upload-icon-default');
+            const successIcon = document.getElementById('teacher-upload-icon-success');
+            const uploadText = document.getElementById('teacher-upload-text');
+            const dragText = document.getElementById('teacher-drag-text');
+            const formatText = document.getElementById('teacher-format-text');
+
+            if (input.files && input.files[0]) {
+                display.textContent = input.files[0].name;
+                display.classList.remove('hidden');
+                dropzone.classList.add('border-emerald-500', 'bg-emerald-50');
+                dropzone.classList.remove('border-slate-300', 'bg-slate-50', 'hover:bg-slate-100');
+                defaultIcon.classList.add('hidden');
+                successIcon.classList.remove('hidden');
+                uploadText.textContent = 'File ready to import';
+                dragText.classList.add('hidden');
+                formatText.classList.add('hidden');
+            } else {
+                display.textContent = '';
+                display.classList.add('hidden');
+                dropzone.classList.remove('border-emerald-500', 'bg-emerald-50');
+                dropzone.classList.add('border-slate-300', 'bg-slate-50', 'hover:bg-slate-100');
+                defaultIcon.classList.remove('hidden');
+                successIcon.classList.add('hidden');
+                uploadText.textContent = 'Click to upload';
+                dragText.classList.remove('hidden');
+                formatText.classList.remove('hidden');
+            }
+        }
+
+        @if($errors->has('file'))
+            openTeacherImportModal();
+        @endif
     </script>
 
     {{-- Import Modal --}}
-    <div id="teacherImportModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 px-4 py-6 backdrop-blur-sm">
-        <div class="w-full max-w-md overflow-hidden rounded-[28px] bg-white ring-1 ring-slate-200/50 shadow-[0_24px_80px_-12px_rgba(18,38,104,0.4)]">
+    <div id="teacherImportModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 px-4 py-6 backdrop-blur-sm transition-all duration-300">
+        <div class="w-full max-w-lg overflow-hidden rounded-[28px] bg-white ring-1 ring-slate-200/50 shadow-[0_24px_80px_-12px_rgba(18,38,104,0.4)]">
             <div class="border-b border-slate-100 px-6 py-5 flex items-start justify-between gap-4">
                 <div>
                     <h2 class="text-2xl font-semibold text-slate-900">Import Teachers</h2>
-                    <p class="text-sm text-slate-400 mt-0.5">Upload CSV / Excel file</p>
+                    <p class="text-sm text-slate-500">Upload an Excel or CSV file to import records.</p>
                 </div>
-                <button type="button" onclick="closeTeacherImportModal()" class="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">
-                    <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current stroke-[2]"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" /></svg>
+                <button type="button" onclick="closeTeacherImportModal()" class="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700" aria-label="Close dialog">
+                    <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current stroke-[2]"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
-            <form method="POST" action="{{ route('admin.teachers.import') }}" enctype="multipart/form-data" class="px-6 py-6 space-y-5">
-                @csrf
-                <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 px-6 py-8 text-center">
-                    <svg class="mx-auto mb-3 h-10 w-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-                    </svg>
-                    <label for="teacher_import_file" class="cursor-pointer text-sm font-semibold text-slate-700 hover:text-slate-900">
-                        Click to choose file
-                        <input id="teacher_import_file" type="file" name="file" accept=".csv,.xlsx,.xls" class="sr-only">
-                    </label>
-                    <p class="mt-1 text-xs text-slate-400">CSV, XLS, or XLSX · Max 10MB</p>
+
+            @if($errors->has('file'))
+                <div class="mx-6 mt-5 rounded-3xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                    {{ $errors->first('file') }}
                 </div>
-                <p class="text-xs text-slate-400">Expected columns: <code class="bg-slate-100 px-1 rounded">name, email, phone, specialization, qualification</code></p>
-                <div class="flex items-center gap-3">
-                    <button type="button" onclick="closeTeacherImportModal()" class="flex-1 rounded-3xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">Cancel</button>
-                    <button type="submit" class="flex-1 rounded-3xl bg-[linear-gradient(135deg,#1e293b_0%,#0f172a_100%)] px-4 py-3.5 text-sm font-semibold text-white shadow-[0_18px_38px_rgba(15,23,42,0.28)] transition hover:-translate-y-px">Import</button>
+            @endif
+
+            <form method="POST" action="{{ route('admin.teachers.import') }}" enctype="multipart/form-data" class="px-6 py-6 space-y-6">
+                @csrf
+                
+                <!-- Upload Area -->
+                <label id="teacherDropzone" for="teacher_import_file" class="group cursor-pointer block relative overflow-hidden rounded-[24px] border-2 border-dashed border-slate-300 bg-slate-50 transition-all hover:bg-slate-100 hover:border-slate-400"
+                     ondragover="event.preventDefault(); this.classList.add('border-emerald-500', 'bg-emerald-50'); this.classList.remove('border-slate-300', 'bg-slate-50');"
+                     ondragleave="event.preventDefault(); this.classList.remove('border-emerald-500', 'bg-emerald-50'); this.classList.add('border-slate-300', 'bg-slate-50');"
+                     ondrop="event.preventDefault(); this.classList.remove('border-emerald-500', 'bg-emerald-50'); this.classList.add('border-slate-300', 'bg-slate-50'); handleTeacherDrop(event)">
+                    
+                    <div class="px-6 py-10 flex flex-col items-center justify-center pointer-events-none">
+                        <div id="teacher-upload-icon-default" class="mb-4 rounded-full bg-white p-4 shadow-sm ring-1 ring-slate-900/5 transition-transform group-hover:scale-105">
+                            <svg class="h-8 w-8 text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                            </svg>
+                        </div>
+                        
+                        <div id="teacher-upload-icon-success" class="mb-4 hidden rounded-full bg-emerald-100 p-4 transition-transform scale-100">
+                            <svg class="h-8 w-8 text-emerald-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        
+                        <h3 id="teacher-upload-text" class="text-base font-semibold text-slate-900">Click to upload</h3>
+                        <p id="teacher-drag-text" class="mt-1 text-sm text-slate-500">or drag and drop here</p>
+                        
+                        <p id="teacherFileNameDisplay" class="mt-2 text-sm font-semibold text-emerald-600 break-all px-4 text-center hidden"></p>
+                        
+                        <p id="teacher-format-text" class="mt-4 text-[13px] text-slate-400">Supports .CSV, .XLS, .XLSX</p>
+                    </div>
+                    
+                    <input id="teacher_import_file" name="file" type="file" class="sr-only" accept=".xlsx,.xls,.csv" required onchange="updateTeacherFileName(this)">
+                </label>
+
+                <!-- Expected Columns -->
+                <div class="rounded-[20px] bg-white border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-50 border-b border-slate-200 px-5 py-3.5 flex items-center justify-between">
+                        <span class="text-[11px] font-bold tracking-wider text-slate-500 uppercase">File Format Guide</span>
+                    </div>
+                    <div class="px-5 py-5">
+                        <p class="text-sm text-slate-600 mb-3">Your spreadsheet must contain these exact column headers:</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="inline-flex items-center rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 font-mono ring-1 ring-inset ring-slate-200/50">name</span>
+                            <span class="inline-flex items-center rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 font-mono ring-1 ring-inset ring-slate-200/50">email</span>
+                            <span class="inline-flex items-center rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 font-mono ring-1 ring-inset ring-slate-200/50">phone</span>
+                            <span class="inline-flex items-center rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 font-mono ring-1 ring-inset ring-slate-200/50">specialization</span>
+                            <span class="inline-flex items-center rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 font-mono ring-1 ring-inset ring-slate-200/50">qualification</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex items-center gap-3 pt-2">
+                    <button type="button" onclick="closeTeacherImportModal()" class="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-slate-900 focus:outline-none">Cancel</button>
+                    <button type="submit" class="flex-1 rounded-xl bg-[linear-gradient(135deg,#1e293b_0%,#0f172a_100%)] px-4 py-3.5 text-sm font-semibold text-white shadow-[0_18px_38px_rgba(15,23,42,0.28)] transition hover:-translate-y-px hover:shadow-[0_22px_42px_rgba(15,23,42,0.34)] focus:outline-none">Import Data</button>
                 </div>
             </form>
         </div>

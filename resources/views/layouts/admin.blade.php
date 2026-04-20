@@ -9,9 +9,20 @@
 </head>
 <body class="min-h-screen bg-[#d7def8] text-slate-800">
 <div id="app-wrapper" class="min-h-screen transition-all duration-500">
-    <div class="flex min-h-screen w-full overflow-hidden bg-[#eef2ff]">
-        <aside class="hidden w-[240px] shrink-0 flex-col bg-slate-900 px-5 py-5 text-white lg:flex">
-            <div class="mb-8 flex items-center gap-3">
+    <div class="flex min-h-screen w-full overflow-hidden bg-[#eef2ff] relative">
+        <!-- Sidebar overlay -->
+        <div id="sidebarOverlay" class="fixed inset-0 z-40 hidden bg-slate-900/50 backdrop-blur-sm transition-opacity lg:hidden"></div>
+
+        <!-- Sidebar -->
+        <aside id="adminSidebar" class="fixed inset-y-0 left-0 z-50 flex w-[240px] -translate-x-full flex-col bg-slate-900 px-5 py-5 text-white transition-transform duration-300 shadow-2xl lg:static lg:translate-x-0 lg:shadow-none lg:shrink-0">
+            <!-- Close Button (Mobile Only) -->
+            <button id="closeSidebarBtn" class="absolute right-4 top-5 rounded-lg p-1 text-white/50 hover:bg-white/10 hover:text-white lg:hidden">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div class="mb-8 flex items-center gap-3 pr-8 lg:pr-0">
                 <div class="grid h-11 w-11 place-items-center rounded-2xl bg-white/15 ring-1 ring-white/20">
                     <svg viewBox="0 0 24 24" class="h-6 w-6 fill-none stroke-current stroke-[1.8]">
                         <path d="M12 2l8 4v6c0 5-3.5 9.4-8 10-4.5-.6-8-5-8-10V6l8-4z" />
@@ -69,9 +80,16 @@
         <div class="flex min-w-0 flex-1 flex-col">
             <header class="border-b border-slate-200/70 bg-white/75 px-5 py-3 backdrop-blur xl:px-8">
                 <div class="flex items-center justify-between gap-4">
-                    <div>
-                        <p class="text-sm text-slate-500">{{ $eyebrow ?? 'Student Management System' }}</p>
-                        <h1 class="text-2xl font-semibold tracking-tight text-slate-900">{{ $header ?? 'Dashboard' }}</h1>
+                    <div class="flex items-center gap-4">
+                        <button id="mobileMenuBtn" class="lg:hidden rounded-lg p-2 -ml-2 text-slate-600 border border-slate-200 bg-white hover:bg-slate-50 transition-colors shadow-sm">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                            </svg>
+                        </button>
+                        <div>
+                            <p class="text-sm text-slate-500">{{ $eyebrow ?? 'Student Management System' }}</p>
+                            <h1 class="text-2xl font-semibold tracking-tight text-slate-900">{{ $header ?? 'Dashboard' }}</h1>
+                        </div>
                     </div>
 
                     <div class="flex items-center gap-3">
@@ -146,5 +164,60 @@
     </div>
 </div>
     @stack('modals')
+
+    <script>
+        (function() {
+            function initSidebar() {
+                const sidebar = document.getElementById('adminSidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                const openBtn = document.getElementById('mobileMenuBtn');
+                const closeBtn = document.getElementById('closeSidebarBtn');
+
+                if (!sidebar || !overlay || !openBtn) return;
+
+                function openSidebar() {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeSidebar() {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
+
+                openBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openSidebar();
+                });
+
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        closeSidebar();
+                    });
+                }
+
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        closeSidebar();
+                    }
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') closeSidebar();
+                });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initSidebar);
+            } else {
+                initSidebar();
+            }
+        })();
+    </script>
 </body>
 </html>

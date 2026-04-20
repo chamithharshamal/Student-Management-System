@@ -111,8 +111,8 @@
 
 
 
-            <div class="mt-5 overflow-hidden rounded-3xl border border-slate-100">
-                <table class="min-w-full divide-y divide-slate-100 text-left text-base">
+            <div class="mt-5 overflow-x-auto rounded-3xl border border-slate-100">
+                <table class="min-w-full divide-y divide-slate-100 text-left text-base whitespace-nowrap">
                     <thead class="bg-slate-50 text-slate-500">
                         <tr>
                             <th class="px-5 py-4 font-medium">Reg No</th>

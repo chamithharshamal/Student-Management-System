@@ -37,8 +37,8 @@
                     </div>
                 </div>
 
-                <div class="mt-5 overflow-hidden rounded-3xl border border-slate-100">
-                    <table class="min-w-full divide-y divide-slate-100 text-left text-sm">
+                <div class="mt-5 overflow-x-auto rounded-3xl border border-slate-100">
+                    <table class="min-w-full divide-y divide-slate-100 text-left text-sm whitespace-nowrap">
                         <thead class="bg-slate-50 text-slate-500">
                         <tr>
                             <th class="px-4 py-3 font-medium">Reg No</th>
